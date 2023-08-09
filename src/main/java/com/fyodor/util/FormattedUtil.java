@@ -1,2 +1,5 @@
-package main.java.com.fyodor.util;public class FormattedUtil {
+package main.java.com.fyodor.util;
+
+public class FormattedUtil {
+
 }

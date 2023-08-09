@@ -1,2 +1,4 @@
-package main.java.com.fyodor.util;public class PasswordUtil {
+package main.java.com.fyodor.util;
+
+public class PasswordUtil {
 }
