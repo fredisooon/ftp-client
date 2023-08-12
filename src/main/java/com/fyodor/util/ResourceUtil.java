@@ -11,6 +11,7 @@ public class ResourceUtil {
             if (FtpClient.socket != null) FtpClient.socket.close();
             if (FtpClient.writer != null) FtpClient.writer.close();
             if (FtpClient.reader != null) FtpClient.reader.close();
+            if (FtpClient.dataSocket != null) FtpClient.dataSocket.close();
         }
         catch (IOException e) {
             e.printStackTrace();

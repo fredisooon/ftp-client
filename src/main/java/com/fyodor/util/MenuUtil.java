@@ -1,8 +1,8 @@
 package main.java.com.fyodor.util;
 
+import jdk.nashorn.internal.parser.JSONParser;
 import main.java.com.fyodor.ftp.FtpClient;
 import main.java.com.fyodor.service.StudentService;
-
 
 public class MenuUtil {
     private StudentService studentService;
@@ -11,14 +11,33 @@ public class MenuUtil {
         this.studentService = new StudentService();
     }
     public void displayMenu()  {
-        System.out.println("\n===== Меню " + FtpClient.socket.getInetAddress() + " =====");
-        System.out.println("1. Получение списка студентов по имени");
-        System.out.println("2. Получение информации о студенте по id");
-        System.out.println("3. Добавление студента");
-        System.out.println("4. Удаление студента по id");
-        System.out.println("5. Отключиться от сервера");
-        System.out.println("6. Загрузить список студентов. (ONLY FOR TESTING)");
+        String hostAddress = FtpClient.socket.getInetAddress().toString().split("/")[0];
+        String activeMode = "";
+        if (FtpClient.mode != null) {
+            activeMode = " | " + FtpClient.mode.name();
+        }
+        if (FtpClient.mode != null) {
+            System.out.println("\n===== Меню " + hostAddress + activeMode + " =====");
+            System.out.println("1. Получение списка студентов по имени");
+            System.out.println("2. Получение информации о студенте по id");
+            System.out.println("3. Добавление студента");
+            System.out.println("4. Удаление студента по id");
+            System.out.println("5. Отключиться от сервера");
+            System.out.println("6. Выгрузить список студентов. (ONLY FOR TESTING)");
+            System.out.println("7. Вывести список файлов (ONLY FOR TESTING)");
+            System.out.println("8. Скачать файл с сервера (ONLY FOR TESTING)");
+            System.out.println("9. Изменить режим работы");
+        }
+        else {
+            System.out.println("\n===== Меню " + hostAddress + activeMode + " =====");
+            System.out.println("5. Отключиться от сервера");
+            System.out.println("6. Выгрузить список студентов. (ONLY FOR TESTING)");
+            System.out.println("7. Вывести список файлов (ONLY FOR TESTING)");
+            System.out.println("8. Скачать файл с сервера (ONLY FOR TESTING)");
+            System.out.println("9. Выбрать режим работы");
+        }
         processUserChoice();
+
     }
 
 
@@ -42,10 +61,18 @@ public class MenuUtil {
                 break;
             case 6:
                 FtpClient.uploadFile("/Users/fyodor/Desktop/test" +
-                        "/fpt-client/src/main/resources/static/students.json", "/test");
+                        "/fpt-client/src/main/resources/static/students.json", "fyodor-test.json");
                 break;
             case 7:
-                FtpClient.downloadFile("/test/students.json", "/Users/fyodor/Desktop/mock.txt");
+                FtpClient.displayRemoteFiles();
+                break;
+            case 8:
+                FtpClient.downloadRemoteFile("fyodor-test.json", "/Users/fyodor/Desktop/test" +
+                        "/fpt-client/src/main/resources/static/students2.json");
+                break;
+            case 9:
+                FtpClient.setMode();
+//                FtpClient.downloadFile("/test/students.json", "/Users/fyodor/Desktop/mock.txt");
                 break;
         }
     }

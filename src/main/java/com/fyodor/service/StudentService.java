@@ -2,7 +2,6 @@ package main.java.com.fyodor.service;
 
 import main.java.com.fyodor.model.Student;
 import main.java.com.fyodor.util.InputUtil;
-
 public class StudentService {
     public void getStudentByName() {
         String studentName = InputUtil.readStudentName();
