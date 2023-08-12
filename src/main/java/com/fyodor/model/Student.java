@@ -1,18 +1,21 @@
 package main.java.com.fyodor.model;
 
 public class Student {
-    private Long id;
+    private Integer id;
     private String name;
 
-    public Student(Long id, String name) {
+    public Student(Integer id, String name) {
         this.id = id;
         this.name = name;
     }
+    public Student() {
 
-    public void setId(Long id) {
+    }
+
+    public void setId(Integer id) {
         this.id = id;
     }
-    public Long getId() {
+    public Integer getId() {
         return this.id;
     }
     public void setName(String name) {

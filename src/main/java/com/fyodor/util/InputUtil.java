@@ -47,9 +47,9 @@ public class InputUtil {
         return choiceIndex;
     }
 
-    public static long readStudentId() {
+    public static int readStudentId() {
         System.out.println("Введите id студента: ");
-        long studentId = scanner.nextLong();
+        int studentId = scanner.nextInt();
         return studentId;
     }
     public static String readStudentName() {
