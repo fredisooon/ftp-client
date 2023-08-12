@@ -1,11 +1,10 @@
 package main.java.com.fyodor.util;
 
-import jdk.nashorn.internal.parser.JSONParser;
 import main.java.com.fyodor.ftp.FtpClient;
 import main.java.com.fyodor.service.StudentService;
 
 public class MenuUtil {
-    private StudentService studentService;
+    private final StudentService studentService;
 
     public MenuUtil() {
         this.studentService = new StudentService();
@@ -45,7 +44,7 @@ public class MenuUtil {
         int choice = InputUtil.getUserChoice();
         switch (choice) {
             case 1:
-                studentService.getStudentByName();
+                studentService.getStudentsByName();
                 break;
             case 2:
                 studentService.getStudentInfoById();
