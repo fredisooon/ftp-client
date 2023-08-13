@@ -1,6 +1,7 @@
-package main.java.com.fyodor.util;
+package com.fyodor.util;
 
-import main.java.com.fyodor.ftp.FtpClient;
+
+import com.fyodor.ftp.FtpClient;
 
 public class FtpConnectionMenu {
     public FtpConnectionMenu() {

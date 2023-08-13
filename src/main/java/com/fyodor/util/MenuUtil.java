@@ -1,7 +1,8 @@
-package main.java.com.fyodor.util;
+package com.fyodor.util;
 
-import main.java.com.fyodor.ftp.FtpClient;
-import main.java.com.fyodor.service.StudentService;
+
+import com.fyodor.ftp.FtpClient;
+import com.fyodor.service.StudentService;
 
 public class MenuUtil {
     private final StudentService studentService;

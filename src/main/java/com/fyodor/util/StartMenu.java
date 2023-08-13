@@ -1,7 +1,7 @@
-package main.java.com.fyodor.util;
+package com.fyodor.util;
 
-import main.java.com.fyodor.App;
 
+import com.fyodor.App;
 
 public class StartMenu {
     public StartMenu() {

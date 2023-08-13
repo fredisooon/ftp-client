@@ -1,8 +1,7 @@
-package main.java.com.fyodor;
+package com.fyodor;
 
-import main.java.com.fyodor.util.ResourceUtil;
-import main.java.com.fyodor.util.StartMenu;
-
+import com.fyodor.util.ResourceUtil;
+import com.fyodor.util.StartMenu;
 
 public class App implements Runnable {
     public static boolean isRunning = true;

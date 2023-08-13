@@ -1,4 +1,4 @@
-package main.java.com.fyodor.model;
+package com.fyodor.model;
 
 public enum Mode {
     ACTIVE, PASSIVE,

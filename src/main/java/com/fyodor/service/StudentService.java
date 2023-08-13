@@ -1,8 +1,8 @@
-package main.java.com.fyodor.service;
+package com.fyodor.service;
 
-
-import main.java.com.fyodor.model.Student;
-import main.java.com.fyodor.util.InputUtil;
+import com.fyodor.ftp.FtpClient;
+import com.fyodor.model.Student;
+import com.fyodor.util.InputUtil;
 
 import javax.json.*;
 import java.io.IOException;
@@ -10,8 +10,7 @@ import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class StudentService {
     private static final String FILE_PATH = "src/main/resources/static/students2.json";
@@ -35,12 +34,15 @@ public class StudentService {
             String name = studentObject.getString("name");
             students.add(new Student(id, name));
         }
+        // Сортировка списка студентов в алфавитном порядке
+        students.sort(Comparator.comparing(Student::getName));
         return students;
     }
 
     private void writeJsonObjectToFile(JsonObject jsonObject) {
         try {
             Files.write(Paths.get(FILE_PATH), jsonObject.toString().getBytes(StandardCharsets.UTF_8));
+            FtpClient.uploadFile(FILE_PATH, "fyodor-test.json");
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -126,7 +128,12 @@ public class StudentService {
                 int id = studentObject.getInt("id");
 
                 if (id != studentId) {
-                    updatedStudentsArrayBuilder.add(studentValue);
+                    if (id > studentId) {
+                        studentObject = Json.createObjectBuilder(studentObject)
+                                .add("id", id - 1)
+                                .build();
+                    }
+                    updatedStudentsArrayBuilder.add(studentObject);
                 }
             }
 
@@ -138,4 +145,5 @@ public class StudentService {
             System.out.println("Студент с ID " + studentId + " успешно удален из файла.");
         }
     }
+
 }

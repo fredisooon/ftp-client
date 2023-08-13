@@ -1,4 +1,4 @@
-package main.java.com.fyodor.model;
+package com.fyodor.model;
 
 public class User {
     private String login;

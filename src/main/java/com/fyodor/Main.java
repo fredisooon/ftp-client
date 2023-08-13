@@ -1,5 +1,4 @@
-package main.java.com.fyodor;
-
+package com.fyodor;
 
 public class Main {
     public static void main(String[] args) {
