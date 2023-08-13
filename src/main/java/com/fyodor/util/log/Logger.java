@@ -3,8 +3,12 @@ package com.fyodor.util.log;
 public class Logger {
     private static boolean loggingEnabled = true;
 
-    public static void setLoggingEnabled(boolean enabled) {
-        loggingEnabled = enabled;
+    public static void setLoggingEnabled() {
+        loggingEnabled = !loggingEnabled;
+        logInfo("Логирование изменено на " + loggingEnabled);
+    }
+    public static boolean getLoggingEnabled() {
+        return loggingEnabled;
     }
 
     public static void logServerResponse(String message) {

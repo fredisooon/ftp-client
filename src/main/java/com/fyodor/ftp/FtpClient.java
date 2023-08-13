@@ -162,6 +162,7 @@ public class FtpClient {
             }
         }
         isConnected = false;
+        mode = null;
     }
 
     public static void setMode() {
@@ -169,7 +170,7 @@ public class FtpClient {
         System.out.println("1. Пассивный(PASV)");
         System.out.println("2. Активный(PORT)");
         System.out.println("3. Назад");
-        int choice = InputUtil.getUserChoice();
+        int choice = InputUtil.getUserChoice(3);
 
         switch (choice) {
             case 1:
@@ -241,7 +242,6 @@ public class FtpClient {
                 // Вывод сообщения о включении пассивного режима
                 Logger.logInfo("Пассивный режим включен. Адрес: " + serverAddress1 + ", Порт: " + serverPort1);
                 dataSocket = new Socket(serverAddress1, serverPort1);
-                System.out.println(dataSocket.getInetAddress());
                 mode = Mode.PASSIVE;
             }
             catch (IOException e) {
