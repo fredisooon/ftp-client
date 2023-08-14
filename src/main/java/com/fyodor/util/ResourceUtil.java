@@ -9,10 +9,10 @@ public class ResourceUtil {
     public static void closingResources() {
         InputUtil.closeResources();
         try {
-            if (FtpClient.socket != null) FtpClient.socket.close();
-            if (FtpClient.writer != null) FtpClient.writer.close();
-            if (FtpClient.reader != null) FtpClient.reader.close();
-            if (FtpClient.dataSocket != null) FtpClient.dataSocket.close();
+            if (FtpClient.commandSocket != null) FtpClient.commandSocket.close();
+            if (FtpClient.serverCommandWriter != null) FtpClient.serverCommandWriter.close();
+            if (FtpClient.serverResponseReader != null) FtpClient.serverResponseReader.close();
+            if (FtpClient.dataTransferSocket != null) FtpClient.dataTransferSocket.close();
         }
         catch (IOException e) {
             e.printStackTrace();

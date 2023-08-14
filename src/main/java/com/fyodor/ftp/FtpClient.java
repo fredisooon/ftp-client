@@ -11,49 +11,83 @@ import java.net.Socket;
 
 public class FtpClient {
     public static boolean isConnected = false;
+    private boolean connection;
     public static String address = null;
     public static User loggedInUser = null;
-    public static Socket socket = null;
-    public static Socket dataSocket = null;
+
+
+    public static Socket commandSocket = null;
+    public static Socket dataTransferSocket = null;
+
+    public static BufferedReader serverResponseReader = null;
+    public static BufferedWriter serverCommandWriter = null;
+    public static Mode mode = null;
+    public static final int FTP_COMMAND_PORT = 21;
+    public static final int FTP_DATA_TRANSFER_PORT = 20;
     public static OutputStream dataOutputStream = null;
     public static FileInputStream fileInputStream = null;
-    public static BufferedReader reader = null;
-    public static BufferedWriter writer = null;
-    public static Mode mode = null;
 
-    public static boolean connect(String ip, String username, String password) {
+
+    public void connect(String ip, String username, String password) {
 //        String serverAddress = "test.rebex.net";
-        String serverAddress = "ftp.dlptest.com";
 //        String serverAddress = "eu-central-1.sftpcloud.io";
-        String serverPort = "21";
+        String serverAddress = "ftp.dlptest.com";
+        User user = new User(username, password);
+        try {
+            commandSocket = new Socket(serverAddress, FTP_COMMAND_PORT);
+            serverResponseReader = new BufferedReader(new InputStreamReader(commandSocket.getInputStream()));
+            serverCommandWriter = new BufferedWriter(new OutputStreamWriter(commandSocket.getOutputStream()));
+
+            String response = getResponse();
+            if (response.startsWith("2")) {
+                // Отправка команды для аутентификации
+                sendCommand("USER " + username + "\r\n");
+                response = getResponse();
+
+                if (response.startsWith("3")) {
+                    // Отправка команды для передачи пароля
+                    sendCommand("PASS " + password + "\r\n");
+                    response = getResponse();
+
+                    if (response.startsWith("2")) {
+                        // Устанавливаем бинарный режим передачи данных
+                        sendCommand("TYPE I\r\n");
+                        response = getResponse();
+                    }
+                }
+            }
+            else {
+                Logger.logWarning(response);
+            }
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    public static boolean connect(String ip, String username, String password, int o) {
+//        String serverAddress = "test.rebex.net";
+//        String serverAddress = "eu-central-1.sftpcloud.io";
+        String serverAddress = "ftp.dlptest.com";
 
         try {
-            socket = new Socket(serverAddress, Integer.parseInt(serverPort));
-            reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+            commandSocket = new Socket(serverAddress, FTP_COMMAND_PORT);
+            serverResponseReader = new BufferedReader(new InputStreamReader(commandSocket.getInputStream()));
+            serverCommandWriter = new BufferedWriter(new OutputStreamWriter(commandSocket.getOutputStream()));
+            String response;
 
-            String response = reader.readLine();
-            Logger.logServerResponse(response);
-
+            getResponse();
             // Отправка команды для аутентификации
-            writer.write("USER " + username + "\r\n");
-            writer.flush();
+            sendCommand("USER " + username + "\r\n");
+            getResponse();
 
-            response = reader.readLine();
-            Logger.logServerResponse(response);
 
             // Отправка команды для передачи пароля
-            writer.write("PASS " + password + "\r\n");
-            writer.flush();
-            response = reader.readLine();
-            Logger.logServerResponse(response);
+            sendCommand("PASS " + password + "\r\n");
+            getResponse();
 
-            writer.write("TYPE I\r\n"); // Устанавливаем бинарный режим передачи данных
-            writer.flush();
-            response = reader.readLine(); // Читаем ответ сервера
-            Logger.logServerResponse(response);
-
-
+            // Устанавливаем бинарный режим передачи данных
+            sendCommand("TYPE I\r\n");
+            getResponse();
 
             // Установка флага успешного подключения
             isConnected = true;
@@ -63,6 +97,26 @@ public class FtpClient {
         }
         return isConnected;
     }
+    private static void sendCommand(String command) {
+        try {
+            serverCommandWriter.write(command);
+            serverCommandWriter.flush();
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    private static String getResponse() {
+        String response = "";
+        try {
+            response = serverResponseReader.readLine();
+            Logger.logServerResponse(response);
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+        return response;
+    }
 
     public static void uploadFile(String localFilePath, String remoteFilePath) {
         if (!isConnected) {
@@ -71,13 +125,10 @@ public class FtpClient {
         }
 
         try {
+            sendCommand("STOR " + remoteFilePath + "\r\n");
+            getResponse();
 
-            writer.write("STOR " + remoteFilePath + "\r\n");
-            writer.flush();
-            String response = reader.readLine(); // Читаем ответ сервера
-            Logger.logServerResponse(response);
-
-            dataOutputStream = dataSocket.getOutputStream();
+            dataOutputStream = dataTransferSocket.getOutputStream();
             fileInputStream = new FileInputStream(localFilePath);
 
             byte[] buffer = new byte[4096];
@@ -89,10 +140,8 @@ public class FtpClient {
             // Закрываем потоки и сокет для передачи данных
             fileInputStream.close();
             dataOutputStream.close();
-//            dataSocket.close();
-            response = reader.readLine(); // Читаем ответ сервера
-            Logger.logServerResponse(response);
-
+//            dataSocket.close()
+            getResponse();
 
 
             Logger.logInfo("File uploaded successfully to " + remoteFilePath);
@@ -114,12 +163,8 @@ public class FtpClient {
 
         try {
             // Отправляем команду RETR для скачивания файла
-            writer.write("RETR " + remoteFilePath + "\r\n");
-            writer.flush();
-
-            // Читаем ответ сервера
-            String response = reader.readLine();
-            Logger.logServerResponse(response);
+            sendCommand("RETR " + remoteFilePath + "\r\n");
+            String response = getResponse();
 
             // Дожидаемся ответа сервера 150, который указывает на начало передачи данных
             if (response.startsWith("150")) {
@@ -129,7 +174,7 @@ public class FtpClient {
                 // Получаем соединение данных (предполагая пассивный режим)
 
                 // Читаем данные и записываем их в локальный файл
-                InputStream dataInputStream = dataSocket.getInputStream();
+                InputStream dataInputStream = dataTransferSocket.getInputStream();
                 byte[] buffer = new byte[4096];
                 int bytesRead;
                 while ((bytesRead = dataInputStream.read(buffer)) != -1) {
@@ -142,8 +187,7 @@ public class FtpClient {
 //                dataSocket.close();
 
                 // Читаем ответ сервера 226, который указывает на завершение передачи данных
-                response = reader.readLine();
-                Logger.logServerResponse(response);
+                getResponse();
 
                 Logger.logInfo("File downloaded successfully to " + localFilePath);
             }
@@ -154,9 +198,9 @@ public class FtpClient {
 
 
     public static void disconnect() {
-        if (socket != null) {
+        if (commandSocket != null) {
             try {
-                socket.close();
+                commandSocket.close();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -202,9 +246,9 @@ public class FtpClient {
 //                        localAddress.replace('.', ','), localPort / 256, localPort % 256);
                 String portCommand = "192,168,0,96,39,15";
                 System.out.println("Port command: " + portCommand);
-                writer.write("PORT " + portCommand);
-                writer.flush();
-                String response = reader.readLine();
+                serverCommandWriter.write("PORT " + portCommand);
+                serverCommandWriter.flush();
+                String response = serverResponseReader.readLine();
                 Logger.logServerResponse(response);
 //                BufferedReader dataReader = new BufferedReader(new InputStreamReader(dataSocket.getInputStream()));
 //                PrintWriter dataWriter = new PrintWriter(dataSocket.getOutputStream(), true);
@@ -212,7 +256,7 @@ public class FtpClient {
                 // Пример чтения ответа от сервера
 //                String response = dataReader.readLine();
 //                System.out.println("Server response: " + response);
-//                String response = reader.readLine();
+//                String response = serverResponseReader.readLine();
 //                System.out.println("Server: " + response);
                 mode = Mode.ACTIVE;
 //                serverSocket.close();
@@ -226,10 +270,8 @@ public class FtpClient {
     private static void enablePassiveMode() {
         if (mode != Mode.PASSIVE) {
             try {
-                writer.write("PASV\r\n");
-                writer.flush();
-                String response = reader.readLine();
-                Logger.logServerResponse(response);
+                sendCommand("PASV\r\n");
+                String response = getResponse();
 
                 int startIndex = response.indexOf("(");
                 int endIndex = response.indexOf(")");
@@ -241,7 +283,7 @@ public class FtpClient {
 
                 // Вывод сообщения о включении пассивного режима
                 Logger.logInfo("Пассивный режим включен. Адрес: " + serverAddress1 + ", Порт: " + serverPort1);
-                dataSocket = new Socket(serverAddress1, serverPort1);
+                dataTransferSocket = new Socket(serverAddress1, serverPort1);
                 mode = Mode.PASSIVE;
             }
             catch (IOException e) {
@@ -261,21 +303,14 @@ public class FtpClient {
         }
         try {
             // Отправляем команду LIST серверу
-            writer.write("LIST\r\n");
-            writer.flush();
-
-            // Читаем ответ сервера
-            String response = reader.readLine();
-            Logger.logInfo(response);
+            sendCommand("LIST\r\n");
+            String response = getResponse();
 
             // Дожидаемся ответа сервера 150, который указывает на начало передачи данных
             if (response.startsWith("150")) {
-                // Устанавливаем соединение данных (в данном случае, предполагаем пассивный режим)
-//                dataOutputStream = dataSocket.getOutputStream();
-//                Socket dataSocket = getDataSocket();
 
                 // Читаем данные о списках файлов и директорий
-                BufferedReader dataReader = new BufferedReader(new InputStreamReader(dataSocket.getInputStream()));
+                BufferedReader dataReader = new BufferedReader(new InputStreamReader(dataTransferSocket.getInputStream()));
                 String line;
                 while ((line = dataReader.readLine()) != null) {
                     System.out.println(line); // Выводим каждую строку списка на консоль
@@ -283,14 +318,20 @@ public class FtpClient {
 
                 // Закрываем соединение данных и читателя
                 dataReader.close();
-//                dataSocket.close();
 
                 // Читаем ответ сервера 226, который указывает на завершение передачи данных
-                response = reader.readLine();
-                Logger.logInfo(response);
+                getResponse();
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public boolean isConnection() {
+        return connection;
+    }
+
+    public void setConnection(boolean connection) {
+        this.connection = connection;
     }
 }

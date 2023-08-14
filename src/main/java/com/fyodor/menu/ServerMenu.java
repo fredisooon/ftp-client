@@ -47,7 +47,7 @@ public class ServerMenu implements Menu {
     }
 
     private String currentHostAndMode() {
-        String hostAddress = FtpClient.socket.getInetAddress().toString().split("/")[0];
+        String hostAddress = FtpClient.commandSocket.getInetAddress().toString().split("/")[0];
         String activeMode = "";
         if (FtpClient.mode != null) {
             activeMode = " | " + FtpClient.mode.name();

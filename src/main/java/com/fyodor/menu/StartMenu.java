@@ -2,7 +2,6 @@ package com.fyodor.menu;
 
 
 import com.fyodor.App;
-import com.fyodor.util.FtpConnectionMenu;
 import com.fyodor.util.InputUtil;
 
 public class StartMenu implements Menu {
