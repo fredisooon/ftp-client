@@ -139,24 +139,19 @@ public class FileTransferManager {
         }
 
         try {
-            // Sending the LIST command to the server
             ftpClient.sendCommand("LIST\r\n");
             String response = ftpClient.getResponse();
 
-            // Waiting for a 150 response indicating the start of data transfer
             if (response.startsWith("150")) {
 
-                // Reading data about the list of files and directories
                 BufferedReader dataReader = new BufferedReader(new InputStreamReader(ftpClient.getDataTransferSocket().getInputStream()));
                 String line;
                 while ((line = dataReader.readLine()) != null) {
                     System.out.println(line);
                 }
 
-                // Closing the data connection and the reader
                 dataReader.close();
 
-                // Reading the 226 response indicating the completion of data transfer
                 ftpClient.getResponse();
             }
         } catch (IOException e) {
