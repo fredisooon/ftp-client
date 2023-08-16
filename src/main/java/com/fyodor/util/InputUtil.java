@@ -41,6 +41,10 @@ public class InputUtil {
             return e.getMessage();
         }
     }
+    public static String readFilePath() {
+        System.out.println("Введите путь до файла: ");
+        return scanner.nextLine().trim();
+    }
     public static int getUserChoice(int menuHeight) {
         int choiceIndex = -1;
         try {
@@ -63,7 +67,21 @@ public class InputUtil {
 
     public static int readStudentId() {
         System.out.println("Введите id студента: ");
-        return scanner.nextInt();
+        int id = -1;
+        try {
+            id = scanner.nextInt();
+            return id;
+        }
+        catch (InputMismatchException e) {
+            System.out.println("Ошибка: Введите корректное число.");
+            Logger.logWarning("Ошибка ввода id");
+        }
+        catch (Exception e) {
+            System.out.println("Ошибка: Неверный ввод");
+            Logger.logWarning("Ошибка ввода id");
+        }
+        scanner.nextLine();
+        return id;
     }
     public static String readStudentName() {
         System.out.println("Введите имя студента: ");

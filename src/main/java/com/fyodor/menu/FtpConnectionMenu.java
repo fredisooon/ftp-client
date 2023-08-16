@@ -16,17 +16,15 @@ public class FtpConnectionMenu implements Menu {
         System.out.println("Введите пароль: ");
         String password = InputUtil.readPassword();
 
-        FtpClient ftpClient = new FtpClient();
+        FtpClient ftpClient = FtpClient.getInstance();
         ftpClient.connect(serverIp, username, password);
-
-        if (ftpClient.isConnection()) {
-            ServerMenu menuUtil = new ServerMenu();
-            menuUtil.displayMenu();
-        }
-
-        boolean connection = FtpClient.connect(serverIp, username, password, -1);
-        if (connection) {
-            ServerMenu menuUtil = new ServerMenu();
+//        ftpClient.connect(
+//                "ftp.dlptest.com",
+//                "dlpuser",
+//                "rNrKYTX9g7z3RgJRmxWuGHbeu"
+//        );
+        if (ftpClient.isConnected()) {
+            ServerMenu menuUtil = new ServerMenu(FtpClient.getInstance());
             menuUtil.displayMenu();
         }
     }

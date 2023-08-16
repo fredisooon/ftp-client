@@ -27,11 +27,11 @@ public class App implements Runnable {
         ResourceUtil.closingResources();
     }
     public static void exit() {
-        if (instance != null) {
-            App.isRunning = false;
-            if (FtpClient.isConnected)
-                FtpClient.disconnect();
+        FtpClient client = FtpClient.getInstance();
+        if (client.isConnected()) {
+            client.disconnect();
         }
+        App.isRunning = false;
     }
 
 }

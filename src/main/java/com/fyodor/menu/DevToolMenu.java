@@ -1,11 +1,10 @@
 package com.fyodor.menu;
 
-import com.fyodor.ftp.FtpClient;
+import com.fyodor.ftp.FileTransferManager;
 import com.fyodor.util.InputUtil;
-import com.fyodor.util.log.Logger;
 
-public class DevModeMenu implements Menu {
-    private final int menuHeight = 4;
+public class DevToolMenu implements Menu {
+    private final int menuHeight = 3;
     public static boolean backToPrevious;
     @Override
     public void displayMenu() {
@@ -14,8 +13,7 @@ public class DevModeMenu implements Menu {
             System.out.println("\n===== DEV MODE TOOLS =====");
             System.out.println("1. Выгрузить список студентов.");
             System.out.println("2. Вывести список файлов на сервере");
-            System.out.println("3. Скачать файл с сервера");
-            System.out.println("4. Назад");
+            System.out.println("3. Назад");
             processUserChoice();
         }
     }
@@ -25,17 +23,12 @@ public class DevModeMenu implements Menu {
         int choice = InputUtil.getUserChoice(menuHeight);
         switch (choice) {
             case 1:
-                FtpClient.uploadFile("/Users/fyodor/Desktop/test" +
-                        "/fpt-client/src/main/resources/static/students.json", "fyodor-test.json");
+                FileTransferManager.uploadMockFile("mock-students.json");
                 break;
             case 2:
-                FtpClient.displayRemoteFiles();
+                FileTransferManager.displayRemoteFiles();
                 break;
             case 3:
-                FtpClient.downloadRemoteFile("fyodor-test.json", "/Users/fyodor/Desktop/test" +
-                        "/fpt-client/src/main/resources/static/students2.json");
-                break;
-            case 4:
                 backToPrevious = true;
                 break;
         }
