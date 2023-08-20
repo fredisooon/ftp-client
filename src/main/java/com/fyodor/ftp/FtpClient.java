@@ -7,7 +7,6 @@ import com.fyodor.util.InputUtil;
 import com.fyodor.util.log.Logger;
 
 import java.io.*;
-import java.net.InetAddress;
 import java.net.Socket;
 
 public class FtpClient {
@@ -40,6 +39,14 @@ public class FtpClient {
     }
 
     private FtpClient() {
+    }
+
+    public int getPort() {
+        return port;
+    }
+
+    public void setPort(int port) {
+        this.port = port;
     }
 
     public static synchronized FtpClient getInstance() {
@@ -90,6 +97,10 @@ public class FtpClient {
         }
     }
 
+    public void setServerAddress(String serverAddress) {
+        this.serverAddress = serverAddress;
+    }
+
     protected String getResponse() {
         String response = "";
         try {
@@ -109,14 +120,20 @@ public class FtpClient {
                 if (response.startsWith("2")) {
                     System.out.println("Соединение с сервером остановлено");
                 }
-                commandSocket.close();
+                if (commandSocket != null) commandSocket.close();
+                if (fileBuffer != null) fileBuffer.close();
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
+        fileBuffer = null;
         address = null;
         isConnected = false;
         mode = null;
+    }
+
+    public String getServerAddress() {
+        return serverAddress;
     }
 
     public void setMode() {
@@ -214,6 +231,7 @@ public class FtpClient {
 
                 // Вывод сообщения о включении пассивного режима
                 Logger.logInfo("Пассивный режим включен. Адрес: " + serverAddress + ", Порт: " + port);
+                setServerAddress(serverAddress);
                 dataTransferSocket = new Socket(serverAddress, port);
                 mode = Mode.PASSIVE;
             }

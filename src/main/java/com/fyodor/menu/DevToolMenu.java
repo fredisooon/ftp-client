@@ -1,6 +1,7 @@
 package com.fyodor.menu;
 
 import com.fyodor.ftp.FileTransferManager;
+import com.fyodor.ftp.FtpClient;
 import com.fyodor.util.InputUtil;
 
 public class DevToolMenu implements Menu {
@@ -8,6 +9,10 @@ public class DevToolMenu implements Menu {
     public static boolean backToPrevious;
     @Override
     public void displayMenu() {
+        if (FtpClient.getInstance().getMode() == null) {
+            System.out.println("\nНеобходимо выбрать режим работы");
+            return;
+        }
         backToPrevious = false;
         while (!backToPrevious) {
             System.out.println("\n===== DEV MODE TOOLS =====");

@@ -4,6 +4,8 @@ import com.fyodor.util.InputUtil;
 import com.fyodor.util.log.Logger;
 
 import java.io.*;
+import java.net.InetSocketAddress;
+import java.net.Socket;
 
 public class FileTransferManager {
     private static OutputStream dataOutputStream;
@@ -16,6 +18,11 @@ public class FileTransferManager {
             Logger.logWarning("Not connected to the server.");
             return;
         }
+        if (ftpClient.getDataTransferSocket().isClosed()) {
+            System.out.println("\nФайл уже выгружен");
+            return;
+        }
+
 
         try (InputStream resourceStream = FtpClient.class.getResourceAsStream(MOCK_FILE_PATH)) {
             ftpClient.sendCommand("STOR " + remoteFilePath + "\r\n");
@@ -84,6 +91,10 @@ public class FileTransferManager {
     }
 
     public static void downloadRemoteFile() {
+        if (FtpClient.getInstance().getMode() == null) {
+            System.out.println("\nНеобходимо выбрать режим");
+            return;
+        }
         String remoteFilePath = InputUtil.readFilePath();
         FtpClient ftpClient = FtpClient.getInstance();
 

@@ -20,9 +20,9 @@ public class ServerMenu implements Menu {
     public void displayMenu()  {
         while (ftpClient.isConnected()) {
             System.out.println("\n===== FTP MENU " + InfoUtil.currentHostAndMode() + InfoUtil.currentFile() + " =====");
-            System.out.println("1. CRUD операции");
-            System.out.println("2. Выбрать режим работы" + hint());
-            System.out.println("3. Загрузить файл");
+            System.out.println("1. CRUD операции" + crudMenuHint());
+            System.out.println("2. Выбрать режим работы" + setModeHint());
+            System.out.println("3. Загрузить файл" + downloadFileHint());
             System.out.println("4. DEV TOOLS");
             System.out.println("5. Настройки");
             System.out.println("6. Отключиться от сервера");
@@ -66,9 +66,25 @@ public class ServerMenu implements Menu {
 
 
 
-    private String hint() {
+    private String setModeHint() {
         if (ftpClient.getMode() == null)
             return " <-*";
+        else
+            return "";
+    }
+
+    private String downloadFileHint() {
+        if (ftpClient.getMode() != null && ftpClient.getFileBuffer() == null) {
+            return " <-*";
+        }
+        else
+            return "";
+    }
+
+    private String crudMenuHint() {
+        if (ftpClient.getMode() != null && ftpClient.getFileBuffer() != null) {
+            return " <-*";
+        }
         else
             return "";
     }

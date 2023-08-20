@@ -1,5 +1,6 @@
 package com.fyodor.menu;
 
+import com.fyodor.ftp.FtpClient;
 import com.fyodor.service.StudentService;
 import com.fyodor.util.InfoUtil;
 import com.fyodor.util.InputUtil;
@@ -15,6 +16,14 @@ public class CRUDMenu implements Menu{
 
     @Override
     public void displayMenu() {
+        if (FtpClient.getInstance().getMode() == null) {
+            System.out.println("\nНеобходимо выбрать режим работы");
+            return;
+        }
+        if (FtpClient.getInstance().getFileBuffer() == null) {
+            System.out.println("\nНеобходимо загрузить файл");
+            return;
+        }
         backToPrevious = false;
         while (!backToPrevious) {
             System.out.println("\n===== FTP CRUD MENU " + InfoUtil.currentHostAndMode() + InfoUtil.currentFile() + InfoUtil.currentSort() + " =====");
